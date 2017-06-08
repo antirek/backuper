@@ -1,5 +1,6 @@
 import unittest
-import backup
+
+from backuper import backup
 
 
 class MysqlBackuperTest(unittest.TestCase):

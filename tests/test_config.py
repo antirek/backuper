@@ -1,6 +1,7 @@
-import unittest
-import config
 import ConfigParser
+import unittest
+
+from backuper import config
 from os import path
 
 

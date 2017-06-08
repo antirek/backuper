@@ -2,14 +2,14 @@
 # coding: utf-8
 import ConfigParser
 import argparse
-import sys
 import logging
+import sys
 
 import os
 from os import path
 
-import backup
-import config
+from backuper import backup
+from backuper import config
 
 formatter = logging.Formatter(fmt='%(asctime)s %(message)s')
 
