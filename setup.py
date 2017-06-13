@@ -11,4 +11,8 @@ setup(
     url='https://github.com/antirek/backuper',
     download_url='https://github.com/antirek/backuper/archive/0.1.tar.gz',
     scripts=['bin/backuper', ],
+    data_files=[
+        ('/etc/backuper', ['config/backuper.conf']),
+        ('/etc/backuper/databases', ['config/databases/mysql.conf']),
+    ],
 )
