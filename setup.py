@@ -9,5 +9,6 @@ setup(
     maintainer_email='serge.dmitriev@gmail.com',
     packages=['backuper', ],
     url='https://github.com/antirek/backuper',
-    download_url='https://github.com/antirek/backuper/archive/0.1.tar.gz'
+    download_url='https://github.com/antirek/backuper/archive/0.1.tar.gz',
+    scripts=['bin/backuper', ],
 )

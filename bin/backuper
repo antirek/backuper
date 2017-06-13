@@ -1,0 +1,68 @@
+#!/usr/bin/env python
+# coding: utf-8
+import ConfigParser
+import argparse
+import logging
+import sys
+
+import os
+from os import path
+
+from backuper import backup
+from backuper import config
+
+formatter = logging.Formatter(fmt='%(asctime)s %(message)s')
+
+
+class LoggerFactory:
+    def __init__(self, log_dir_path):
+        self.log_dir_path = log_dir_path
+
+    def create_logger(self, file_name, level=logging.INFO):
+        """
+
+        :type file_name: str
+        :type level: int
+        :return: logging.Logger
+        """
+        logger = logging.getLogger(file_name)
+        logger.propagate = False
+        logger.setLevel(level)
+        handler = logging.FileHandler(path.join(self.log_dir_path, file_name + '.log'))
+        handler.setLevel(level)
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        return logger
+
+
+def get_database_config_file_names_from_dir(dir_path):
+    return [file_name for file_name in os.listdir(dir_path) if file_name.endswith('.conf')]
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    '-c', '--config', help=u'Путь к директории конфигурации', default=os.getenv('BACKUPER_CONFIG_DIR')
+)
+args = parser.parse_args()
+main_config_parser = ConfigParser.ConfigParser()
+ftp_config_keeper = config.FtpConfigKeeper(main_config_parser)
+if not args.config:
+    sys.exit(u'Ошибка: не указан путь к директории конфигурации')
+main_config_parser.read(path.join(args.config, 'backuper.conf'))
+logger_factory = LoggerFactory(main_config_parser.get('logging', 'dir_path'))
+main_logger = logger_factory.create_logger('backuper')
+main_logger.info('Start')
+smtp_config = config.convert_config_items_to_dict(main_config_parser.items('smtp'), ['emails', ])
+email_sender = backup.EmailSender(smtp_config)
+database_configs_dir_path = path.join(args.config, 'databases')
+for config_file_name in get_database_config_file_names_from_dir(database_configs_dir_path):
+    config_file_base_name = path.splitext(config_file_name)[0]
+    db_logger = logger_factory.create_logger(config_file_base_name)
+    db_config_parser = ConfigParser.ConfigParser()
+    db_config_parser.read(path.join(database_configs_dir_path, config_file_name))
+    db_config = config.convert_config_items_to_dict(db_config_parser.items('db'), ['ignore', 'tables'])
+    ftp_config = ftp_config_keeper.get_full_config(
+        config.convert_config_items_to_dict(db_config_parser.items('ftp'))
+    )
+    backup.Backuper(db_config, ftp_config, email_sender, db_logger).backup()
+main_logger.info('End')
