@@ -1,6 +1,14 @@
 # backuper
 
-backup config tool for db mysqldump, mongodump, pg_dump
+backup tool for db mysqldump, mongodump, pg_dump
+
+- backup databases: mysql, mongodb, postgresql
+
+- move backup to ftp
+
+- send notification to email
+
+- use one conf file per database in ini-format 
 
 
 ## install 
@@ -16,8 +24,6 @@ require python2, pip
 
 - add database config files to /etc/backuper/databases
 
-- add cron task 
-
-file /etc/crontab
+- add cron task to /etc/crontab
 
 > 10 1    * * *   root    /usr/local/bin/backuper -c /etc/backuper
