@@ -70,7 +70,7 @@ class DatabaseBackuper:
 
     def _copy_backup_file_to_ftp(self):
         ftp = self._ftp_config
-        command = 'ftp -n ' + ftp['host'] + ' <<End-Of-Session\n'
+        command = 'ftp -n -p ' + ftp['host'] + ' <<End-Of-Session\n'
         command += 'user ' + ftp['user'] + ' ' + ftp['password'] + '\n'
         command += 'put {} '.format(self._temp_backup_file_path)
         if 'directory' in ftp:
